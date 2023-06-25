@@ -52,8 +52,8 @@ The ``docs/conf.py`` would look like this:
    # other statements
 
    extensions = ['sphinx.ext.autodoc', 'sphinxcontrib.matlab']
-   this_dir = Path(__file__).resolve().parent
-   matlab_src_dir = this_dir / '..' / '..'
+   this_dir = os.path.dirname(os.path.abspath(__file__))
+   matlab_src_dir = os.path.abspath(os.path.join(this_dir, '..'))
    primary_domain = 'mat'
 
 Example
