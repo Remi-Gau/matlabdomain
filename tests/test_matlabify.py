@@ -50,7 +50,7 @@ def test_module(mod):
     assert not mod.getter("__module__")
     assert not mod.getter("__doc__")
     all_entities = mod.getter("__all__")
-    all_items = set(name for name, entity in all_entities)
+    all_items = {name for name, entity in all_entities}
     expected_items = {
         "+package",
         "@ClassFolder",

@@ -434,7 +434,7 @@ def test_ClassWithBuiltinProperties():
     )
     assert obj.name == "ClassWithBuiltinProperties"
     assert obj.docstring == " Class with properties that overload a builtin\n"
-    assert set(obj.properties) == set(["omega", "alpha", "gamma", "beta"])
+    assert set(obj.properties) == {"omega", "alpha", "gamma", "beta"}
     assert obj.properties["omega"]["docstring"] == " a property"
     assert obj.properties["alpha"]["docstring"] == (" a property overloading a builtin")
     assert obj.properties["gamma"]["docstring"] == (
@@ -615,7 +615,7 @@ def test_ClassWithDoubleQuotedString():
     )
     assert isinstance(obj, mat_types.MatClass)
     assert obj.name == "ClassWithDoubleQuotedString"
-    assert set(obj.methods.keys()) == set(["ClassWithDoubleQuotedString", "method1"])
+    assert set(obj.methods.keys()) == {"ClassWithDoubleQuotedString", "method1"}
     assert obj.properties == {
         "Property1": {"docstring": None, "attrs": {}, "default": None}
     }
@@ -626,7 +626,7 @@ def test_ClassWithStrings():
     obj = mat_types.MatObject.parse_mfile(mfile, "ClassWithStrings", "test_data")
     assert isinstance(obj, mat_types.MatClass)
     assert obj.name == "ClassWithStrings"
-    assert set(obj.methods.keys()) == set(["raiseError"])
+    assert set(obj.methods.keys()) == {"raiseError"}
 
 
 def test_ClassWithDummyArguments():
@@ -634,7 +634,7 @@ def test_ClassWithDummyArguments():
     obj = mat_types.MatObject.parse_mfile(mfile, "ClassWithDummyArguments", "test_data")
     assert isinstance(obj, mat_types.MatClass)
     assert obj.name == "ClassWithDummyArguments"
-    assert set(obj.methods.keys()) == set(["someMethod1", "someMethod2"])
+    assert set(obj.methods.keys()) == {"someMethod1", "someMethod2"}
     m1 = obj.methods["someMethod1"]
     assert m1.args == ["obj", "argument"]
     m2 = obj.methods["someMethod2"]
@@ -646,7 +646,7 @@ def test_ClassFolderClassdef():
     obj = mat_types.MatObject.parse_mfile(mfile, "ClassFolder", "@ClassFolder")
     assert isinstance(obj, mat_types.MatClass)
     assert obj.name == "ClassFolder"
-    assert set(obj.methods.keys()) == set(["ClassFolder", "method_inside_classdef"])
+    assert set(obj.methods.keys()) == {"ClassFolder", "method_inside_classdef"}
     m1 = obj.methods["ClassFolder"]
     assert m1.args == ["p"]
     m2 = obj.methods["method_inside_classdef"]
@@ -660,7 +660,7 @@ def test_ClassWithMethodsWithSpaces():
     )
     assert isinstance(obj, mat_types.MatClass)
     assert obj.name == "ClassWithMethodsWithSpaces"
-    assert set(obj.methods.keys()) == set(["static_method"])
+    assert set(obj.methods.keys()) == {"static_method"}
     assert (
         obj.docstring
         == " Class with methods that have space after the function name.\n"
@@ -673,7 +673,7 @@ def test_ClassContainingParfor():
     obj = mat_types.MatObject.parse_mfile(mfile, "ClassContainingParfor", "test_data")
     assert isinstance(obj, mat_types.MatClass)
     assert obj.name == "ClassContainingParfor"
-    assert set(obj.methods.keys()) == set(["test"])
+    assert set(obj.methods.keys()) == {"test"}
     assert obj.docstring == " Parfor is a keyword\n"
 
 
@@ -682,7 +682,7 @@ def test_ClassWithStringEllipsis():
     obj = mat_types.MatObject.parse_mfile(mfile, "ClassWithStringEllipsis", "test_data")
     assert isinstance(obj, mat_types.MatClass)
     assert obj.name == "ClassWithStringEllipsis"
-    assert set(obj.methods.keys()) == set(["test"])
+    assert set(obj.methods.keys()) == {"test"}
     assert obj.docstring == " Contains ellipsis in string\n"
 
 

@@ -185,10 +185,10 @@ class MatObject(ObjectDescription):
             elif name_prefix:
                 # class name is given in the signature, but different
                 # (shouldn't happen)
-                fullname = classname + "." + name_prefix + name
+                fullname = f"{classname}.{name_prefix}{name}"
             else:
                 # class name is not given in the signature
-                fullname = classname + "." + name
+                fullname = f"{classname}.{name}"
         else:
             add_module = True
             if name_prefix:
@@ -202,14 +202,11 @@ class MatObject(ObjectDescription):
         signode["class"] = classname
         signode["fullname"] = fullname
 
-        sig_prefix = self.get_signature_prefix(sig)
-        if sig_prefix:
+        if sig_prefix := self.get_signature_prefix(sig):
             signode += addnodes.desc_annotation(sig_prefix, sig_prefix)
 
         if name_prefix:
             signode += addnodes.desc_addname(name_prefix, name_prefix)
-        # exceptions are a special case, since they are documented in the
-        # 'exceptions' module.
         elif add_module and self.env.config.add_module_names:
             modname = self.options.get("module", self.env.temp_data.get("mat:module"))
 
@@ -227,7 +224,7 @@ class MatObject(ObjectDescription):
                 if not self.env.config.matlab_keep_package_prefix:
                     modname = mat_types.strip_package_prefix(modname)
 
-                nodetext = modname + "."
+                nodetext = f"{modname}."
                 signode += addnodes.desc_addname(nodetext, nodetext)
 
         anno = self.options.get("annotation")
@@ -240,14 +237,14 @@ class MatObject(ObjectDescription):
             if retann:
                 signode += addnodes.desc_returns(retann, retann)
             if anno:
-                signode += addnodes.desc_annotation(" " + anno, " " + anno)
+                signode += addnodes.desc_annotation(f" {anno}", f" {anno}")
             return fullname, name_prefix
 
         _pseudo_parse_arglist(signode, arglist)
         if retann:
             signode += addnodes.desc_returns(retann, retann)
         if anno:
-            signode += addnodes.desc_annotation(" " + anno, " " + anno)
+            signode += addnodes.desc_annotation(f" {anno}", f" {anno}")
         return fullname, name_prefix
 
     def get_index_text(self, modname, name):
@@ -265,12 +262,12 @@ class MatObject(ObjectDescription):
             parts = [part for part in parts if part.startswith("+")]
             modname = ".".join(parts)
 
-        fullname = (modname and modname + "." or "") + name_cls[0]
+        fullname = (modname and f"{modname}." or "") + name_cls[0]
         fullname = fullname.lstrip(".")
 
         if not self.env.config.matlab_keep_package_prefix:
             modname_out = mat_types.strip_package_prefix(modname)
-            fullname_out = (modname_out and modname_out + "." or "") + name_cls[0]
+            fullname_out = (modname_out and f"{modname_out}." or "") + name_cls[0]
             fullname_out = fullname_out.lstrip(".")
         else:
             modname_out, fullname_out = modname, fullname
@@ -284,16 +281,12 @@ class MatObject(ObjectDescription):
             objects = self.env.domaindata["mat"]["objects"]
             if fullname_out in objects:
                 self.state_machine.reporter.warning(
-                    "duplicate object description of %s, " % fullname_out
-                    + "other instance in "
-                    + self.env.doc2path(objects[fullname_out][0])
-                    + ", use :noindex: for one of them",
+                    f"duplicate object description of {fullname_out}, other instance in {self.env.doc2path(objects[fullname_out][0])}, use :noindex: for one of them",
                     line=self.lineno,
                 )
             objects[fullname_out] = (self.env.docname, self.objtype)
 
-        indextext = self.get_index_text(modname_out, name_cls)
-        if indextext:
+        if indextext := self.get_index_text(modname_out, name_cls):
             entry = ("single", indextext, fullname_out, "", None)
             self.indexnode["entries"].append(entry)
 
@@ -337,7 +330,7 @@ class MatClasslike(MatObject):
     """
 
     def get_signature_prefix(self, sig):
-        return self.objtype + " "
+        return f"{self.objtype} "
 
     def get_index_text(self, modname, name_cls):
         if self.objtype == "class":
@@ -378,10 +371,7 @@ class MatClassmember(MatObject):
             try:
                 clsname, methname = name.rsplit(".", 1)
             except ValueError:
-                if modname:
-                    return _("%s() (in module %s)") % (name, modname)
-                else:
-                    return "%s()" % name
+                return _("%s() (in module %s)") % (name, modname) if modname else f"{name}()"
             if modname and add_modules:
                 return _("%s() (%s.%s method)") % (methname, modname, clsname)
             else:
@@ -390,10 +380,7 @@ class MatClassmember(MatObject):
             try:
                 clsname, methname = name.rsplit(".", 1)
             except ValueError:
-                if modname:
-                    return _("%s() (in module %s)") % (name, modname)
-                else:
-                    return "%s()" % name
+                return _("%s() (in module %s)") % (name, modname) if modname else f"{name}()"
             if modname and add_modules:
                 return _("%s() (%s.%s static method)") % (methname, modname, clsname)
             else:
@@ -402,10 +389,7 @@ class MatClassmember(MatObject):
             try:
                 clsname, methname = name.rsplit(".", 1)
             except ValueError:
-                if modname:
-                    return _("%s() (in module %s)") % (name, modname)
-                else:
-                    return "%s()" % name
+                return _("%s() (in module %s)") % (name, modname) if modname else f"{name}()"
             if modname:
                 return _("%s() (%s.%s class method)") % (methname, modname, clsname)
             else:
@@ -414,10 +398,7 @@ class MatClassmember(MatObject):
             try:
                 clsname, attrname = name.rsplit(".", 1)
             except ValueError:
-                if modname:
-                    return _("%s (in module %s)") % (name, modname)
-                else:
-                    return name
+                return _("%s (in module %s)") % (name, modname) if modname else name
             if modname and add_modules:
                 return _("%s (%s.%s attribute)") % (attrname, modname, clsname)
             else:
@@ -506,13 +487,13 @@ class MatModule(Directive):
             # make a duplicate entry in 'objects' to facilitate searching for
             # the module in MATLABDomain.find_obj()
             env.domaindata["mat"]["objects"][modname] = (env.docname, "module")
-            targetnode = nodes.target("", "", ids=["module-" + modname], ismod=True)
+            targetnode = nodes.target("", "", ids=[f"module-{modname}"], ismod=True)
             self.state.document.note_explicit_target(targetnode)
             # the platform and synopsis aren't printed; in fact, they are only
             # used in the modindex currently
             ret.append(targetnode)
             indextext = _("%s (module)") % modname_out
-            entry = ("single", indextext, "module-" + modname, "", None)
+            entry = "single", indextext, f"module-{modname}", "", None
             inode = addnodes.index(entries=[entry])
             ret.append(inode)
         return ret
@@ -533,10 +514,7 @@ class MatCurrentModule(Directive):
     def run(self):
         env = self.state.document.settings.env
         modname = self.arguments[0].strip()
-        if modname == "None":
-            env.temp_data["mat:module"] = None
-        else:
-            env.temp_data["mat:module"] = modname
+        env.temp_data["mat:module"] = None if modname == "None" else modname
         return []
 
 
@@ -549,7 +527,7 @@ class MatXRefRole(XRefRole):
             target = target.lstrip("~")  # only has a meaning for the title
             # if the first character is a tilde, don't display the module/class
             # parts of the contents
-            if title[0:1] == "~":
+            if title[:1] == "~":
                 title = title[1:]
                 dot = title.rfind(".")
                 if dot != -1:
@@ -560,7 +538,7 @@ class MatXRefRole(XRefRole):
 
         # if the first character is a dot, search more specific namespaces first
         # else search builtins first
-        if target[0:1] == ".":
+        if target[:1] == ".":
             target = target[1:]
             refnode["refspecific"] = True
         return title, target
@@ -632,7 +610,7 @@ class MATLABModuleIndex(Index):
                     stripped + modname_out,
                     subtype,
                     docname,
-                    "module-" + stripped + modname,
+                    f"module-{stripped}{modname}",
                     platforms,
                     qualifier,
                     synopsis,
@@ -734,54 +712,46 @@ class MATLABDomain(Domain):
             objtypes = self.objtypes_for_role(type)
             if objtypes is not None:
                 if modname and classname:
-                    fullname = modname + "." + classname + "." + name
+                    fullname = f"{modname}.{classname}.{name}"
                     if fullname in objects and objects[fullname][1] in objtypes:
                         newname = fullname
                 if not newname:
                     if (
                         modname
-                        and modname + "." + name in objects
-                        and objects[modname + "." + name][1] in objtypes
+                        and f"{modname}.{name}" in objects
+                        and objects[f"{modname}.{name}"][1] in objtypes
                     ):
-                        newname = modname + "." + name
+                        newname = f"{modname}.{name}"
                     elif name in objects and objects[name][1] in objtypes:
                         newname = name
                     else:
                         # "fuzzy" searching mode
-                        searchname = "." + name
+                        searchname = f".{name}"
                         matches = [
                             (oname, objects[oname])
                             for oname in objects
                             if oname.endswith(searchname)
                             and objects[oname][1] in objtypes
                         ]
-        else:
-            # NOTE: searching for exact match, object type is not considered
-            if name in objects:
-                newname = name
-            elif type == "mod":
-                # only exact matches allowed for modules
-                return []
-            elif classname and classname + "." + name in objects:
-                newname = classname + "." + name
-            elif modname and modname + "." + name in objects:
-                newname = modname + "." + name
-            elif (
-                modname
-                and classname
-                and modname + "." + classname + "." + name in objects
-            ):
-                newname = modname + "." + classname + "." + name
-            # special case: builtin exceptions have module "exceptions" set
-            elif type == "exc" and "." not in name and "exceptions." + name in objects:
-                newname = "exceptions." + name
-            # special case: object methods
-            elif (
-                type in ("func", "meth")
-                and "." not in name
-                and "object." + name in objects
-            ):
-                newname = "object." + name
+        elif name in objects:
+            newname = name
+        elif type == "mod":
+            # only exact matches allowed for modules
+            return []
+        elif classname and f"{classname}.{name}" in objects:
+            newname = f"{classname}.{name}"
+        elif modname and f"{modname}.{name}" in objects:
+            newname = f"{modname}.{name}"
+        elif modname and classname and f"{modname}.{classname}.{name}" in objects:
+            newname = f"{modname}.{classname}.{name}"
+        elif type == "exc" and "." not in name and f"exceptions.{name}" in objects:
+            newname = f"exceptions.{name}"
+        elif (
+            type in ("func", "meth")
+            and "." not in name
+            and f"object.{name}" in objects
+        ):
+            newname = f"object.{name}"
         if newname is not None:
             matches.append((newname, objects[newname]))
         return matches
@@ -789,7 +759,7 @@ class MATLABDomain(Domain):
     def resolve_xref(self, env, fromdocname, builder, type, target, node, contnode):
         modname = node.get("mat:module")
         clsname = node.get("mat:class")
-        searchmode = node.hasattr("refspecific") and 1 or 0
+        searchmode = 1 if node.hasattr("refspecific") else 0
         matches = self.find_obj(env, modname, clsname, target, type, searchmode)
         if not matches:
             return None
@@ -805,26 +775,25 @@ class MATLABDomain(Domain):
 
         name, obj = matches[0]
 
-        if obj[1] == "module":
-            # get additional info for modules
-            docname, synopsis, platform, deprecated = self.data["modules"][name]
-            assert docname == obj[0]
-            title = name
-            if synopsis:
-                title += ": " + synopsis
-            if deprecated:
-                title += _(" (deprecated)")
-            if platform:
-                title += " (" + platform + ")"
-            return make_refnode(
-                builder, fromdocname, docname, "module-" + name, contnode, title
-            )
-        else:
+        if obj[1] != "module":
             return make_refnode(builder, fromdocname, obj[0], name, contnode, name)
+        # get additional info for modules
+        docname, synopsis, platform, deprecated = self.data["modules"][name]
+        assert docname == obj[0]
+        title = name
+        if synopsis:
+            title += f": {synopsis}"
+        if deprecated:
+            title += _(" (deprecated)")
+        if platform:
+            title += f" ({platform})"
+        return make_refnode(
+            builder, fromdocname, docname, f"module-{name}", contnode, title
+        )
 
     def get_objects(self):
         for modname, info in self.data["modules"].items():
-            yield (modname, modname, "module", info[0], "module-" + modname, 0)
+            yield (modname, modname, "module", info[0], f"module-{modname}", 0)
         for refname, (docname, type) in self.data["objects"].items():
             yield (refname, refname, type, docname, refname, 1)
 
@@ -832,10 +801,9 @@ class MATLABDomain(Domain):
         ret = []
         for role in self.roles:
             matrole = f"mat:{role}"
-            element = self.resolve_xref(
+            if element := self.resolve_xref(
                 env, fromdocname, builder, matrole, target, node, contnode
-            )
-            if element:
+            ):
                 ret.append((matrole, element))
         return ret
 

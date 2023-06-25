@@ -136,7 +136,7 @@ def recursive_log_debug(obj, indent=""):
         )
         if isinstance(o, MatModule):
             if o.entities:
-                indent = indent + " "
+                indent = f"{indent} "
                 names = [n_ for n_, o_ in o.entities]
                 logger.debug(
                     "[sphinxcontrib-matlabdomain] %s Names=%s", indent, str(names)
@@ -156,7 +156,7 @@ def recursive_log_debug(obj, indent=""):
 def populate_entities_table(obj, path=""):
     # Recursively scan the hiearachy of entities and populate the entities_table.
     for n, o in obj.entities:
-        fullpath = path + "." + o.name
+        fullpath = f"{path}.{o.name}"
         fullpath = fullpath.lstrip(".")
         entities_table[fullpath] = o
         entities_name_map[strip_package_prefix(fullpath)] = fullpath
@@ -254,12 +254,12 @@ class MatObject(object):
 
     def __repr__(self):
         # __str__() method not required, if not given, then __repr__() used
-        return '<%s: "%s">' % (self.__class__.__name__, self.name)
+        return f'<{self.__class__.__name__}: "{self.name}">'
 
     def getter(self, name, *defargs):
         if name == "__name__":
             return self.__name__
-        elif len(defargs) == 0:
+        elif not defargs:
             logger.debug(
                 '[sphinxcontrib-matlabdomain] Warning attribute "%s" was not found in %s.',
                 name,
@@ -319,8 +319,7 @@ class MatObject(object):
         if os.path.isdir(fullpath):
             if package.startswith("_") or package.startswith("."):
                 return None
-            mod = entities_table.get(package)
-            if mod:
+            if mod := entities_table.get(package):
                 logger.debug(
                     "[sphinxcontrib-matlabdomain] Module %s already loaded.", package
                 )
@@ -330,16 +329,16 @@ class MatObject(object):
                     f"[sphinxcontrib-matlabdomain] matlabify MatModule {package=}, {fullpath=}"
                 )
                 return MatModule(name, fullpath, package)  # import package
-        elif os.path.isfile(fullpath + ".m"):
-            mfile = fullpath + ".m"
+        elif os.path.isfile(f"{fullpath}.m"):
+            mfile = f"{fullpath}.m"
             logger.debug(
                 f"[sphinxcontrib-matlabdomain] matlabify parse_mfile {package=}, {mfile=}"
             )
             return MatObject.parse_mfile(
                 mfile, name, path, MatObject.encoding
             )  # parse mfile
-        elif os.path.isfile(fullpath + ".mlapp"):
-            mlappfile = fullpath + ".mlapp"
+        elif os.path.isfile(f"{fullpath}.mlapp"):
+            mlappfile = f"{fullpath}.mlapp"
             logger.debug(
                 f"[sphinxcontrib-matlabdomain] matlabify parse_mlappfile {package=}, {mlappfile=}"
             )
@@ -516,8 +515,7 @@ class MatModule(MatObject):
             if os.path.isfile(path):
                 key, _ = os.path.splitext(key)
             if not results or key not in list(zip(*results))[0]:
-                value = self.getter(key, None)
-                if value:
+                if value := self.getter(key, None):
                     results.append((key, value))
         self.entities = results
         # results.sort()
@@ -579,9 +577,7 @@ class MatModule(MatObject):
                         name,
                     )
                     return entity_content
-            # If not - try to MATLABIFY it.
-            entity = MatObject.matlabify(".".join([self.package, name]))
-            if entity:
+            if entity := MatObject.matlabify(".".join([self.package, name])):
                 self.entities.append((name, entity))
                 logger.debug(
                     f"[sphinxcontrib-matlabdomain] entity {name=} imported from {self=}"

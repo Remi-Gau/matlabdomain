@@ -78,7 +78,7 @@ def fix_function_signatures(code):
         retv = m.group(0)
         # if no args and doesn't end with parentheses, append "()"
         if not (m.group(3) or m.group(0).endswith("()")):
-            retv = retv.replace(m.group(2), m.group(2) + "()")
+            retv = retv.replace(m.group(2), f"{m.group(2)}()")
         return retv
 
     code = pat.sub(repl, code)  # search for functions and apply replacement
