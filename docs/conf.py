@@ -40,8 +40,10 @@ release = ""
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = ["sphinx.ext.autodoc", "sphinxcontrib.matlab", "sphinx.ext.napoleon"]
-matlab_src_dir = os.path.dirname(os.path.abspath(__file__))
+matlab_src_dir = "/home/remi/github/matlabdomain/"
 primary_domain = "mat"
+matlab_short_links = True
+matlab_auto_link = "all"
 
 
 # Add any paths that contain templates here, relative to this directory.

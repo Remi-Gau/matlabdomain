@@ -6,5 +6,8 @@ function y = times_two_napoleon(x)
 %
 % Returns:
 %    The input value multiplied by two
+%
+% See Also: times_two
+%
 
 y = x * 2;
