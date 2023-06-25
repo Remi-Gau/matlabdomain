@@ -371,7 +371,11 @@ class MatClassmember(MatObject):
             try:
                 clsname, methname = name.rsplit(".", 1)
             except ValueError:
-                return _("%s() (in module %s)") % (name, modname) if modname else f"{name}()"
+                return (
+                    _("%s() (in module %s)") % (name, modname)
+                    if modname
+                    else f"{name}()"
+                )
             if modname and add_modules:
                 return _("%s() (%s.%s method)") % (methname, modname, clsname)
             else:
@@ -380,7 +384,11 @@ class MatClassmember(MatObject):
             try:
                 clsname, methname = name.rsplit(".", 1)
             except ValueError:
-                return _("%s() (in module %s)") % (name, modname) if modname else f"{name}()"
+                return (
+                    _("%s() (in module %s)") % (name, modname)
+                    if modname
+                    else f"{name}()"
+                )
             if modname and add_modules:
                 return _("%s() (%s.%s static method)") % (methname, modname, clsname)
             else:
@@ -389,7 +397,11 @@ class MatClassmember(MatObject):
             try:
                 clsname, methname = name.rsplit(".", 1)
             except ValueError:
-                return _("%s() (in module %s)") % (name, modname) if modname else f"{name}()"
+                return (
+                    _("%s() (in module %s)") % (name, modname)
+                    if modname
+                    else f"{name}()"
+                )
             if modname:
                 return _("%s() (%s.%s class method)") % (methname, modname, clsname)
             else:
@@ -747,9 +759,7 @@ class MATLABDomain(Domain):
         elif type == "exc" and "." not in name and f"exceptions.{name}" in objects:
             newname = f"exceptions.{name}"
         elif (
-            type in ("func", "meth")
-            and "." not in name
-            and f"object.{name}" in objects
+            type in ("func", "meth") and "." not in name and f"object.{name}" in objects
         ):
             newname = f"object.{name}"
         if newname is not None:
